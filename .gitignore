@@ -1,0 +1,22 @@
+
+# Packages
+dist/
+build/
+eggs/
+parts/
+bin/
+var/
+
+
+# Virtual environments
+.venv/
+
+
+# pytest
+.cache/
+
+__pycache__/
+
+# pyenv
+.python-version
+
