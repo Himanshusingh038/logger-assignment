@@ -28,7 +28,7 @@ A customizable logging system that supports logging to multiple sinks such as fi
 
 1. **Clone the repository:**
     ```bash
-    git clone https://github.com/Himanshusingh038/assignment_logger.git
+    git clone https://github.com/Himanshusingh038/logger-assignment.git
     cd logger-system
     ```
 
