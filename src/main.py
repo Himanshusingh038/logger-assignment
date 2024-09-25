@@ -1,5 +1,5 @@
 import datetime
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 
 from src.log.database_sink import DatabaseSink
 from src.enum.log_level import LogLevel
@@ -20,23 +20,31 @@ async def read_root():
 
 @app.post("/test_log")
 async def test_log(log_request: LogRequest):
-    thread_model = ThreadModel[log_request.thread_model]  
-    write_mode = WriteMode[log_request.write_mode]     
-    level = LogLevel(log_request.level)
-    file_sink = FileSink(level=level, file_path="app.log", max_size_kb=50, backup_count=3)
-    console_sink = ConsoleSink(level=level)
-    db_sink = DatabaseSink(level=level, db_path="logs.db")
+    try:
+        thread_model = ThreadModel[log_request.thread_model]  
+        write_mode = WriteMode[log_request.write_mode]     
+        level = LogLevel(log_request.level)
+        file_sink = FileSink(level=level, file_path="app.log", max_size_kb=50, backup_count=3)
+        console_sink = ConsoleSink(level=level)
+        db_sink = DatabaseSink(level=level, db_path="logs.db")
 
-    config = LoggerConfig(
-        timestamp_format=log_request.timestamp_format or "%Y-%m-%d %H:%M:%S",
-        log_level=level,
-        sinks=[file_sink, console_sink, db_sink],
-        thread_model=thread_model,
-        write_mode=write_mode
-    )
-    
-    logger = Logger(config)
-    timestamp = datetime.datetime.now().strftime(config.timestamp_format)
-    logger.log(log_request.message, level, log_request.namespace)
+        config = LoggerConfig(
+            timestamp_format=log_request.timestamp_format or "%Y-%m-%d %H:%M:%S",
+            log_level=level,
+            sinks=[file_sink, console_sink, db_sink],
+            thread_model=thread_model,
+            write_mode=write_mode
+        )
+        
+        logger = Logger(config)
+        timestamp = datetime.datetime.now().strftime(config.timestamp_format)
+        logger.log(log_request.message, level, log_request.namespace)
 
-    return {"message": f"Logged '{log_request.message}' with level {log_request.level} in namespace '{log_request.namespace}' at '{timestamp}'."}
+        return {"message": f"Logged '{log_request.message}' with level {log_request.level} in namespace '{log_request.namespace}' at '{timestamp}'."}
+    except KeyError as e:
+        # Handle cases where enum values are incorrect
+        raise HTTPException(status_code=400, detail=f"Invalid parameter: {str(e)}")
+
+    except Exception as e:
+        # Catch any other unexpected errors
+        raise HTTPException(status_code=500, detail=f"An error occurred while logging: {str(e)}")

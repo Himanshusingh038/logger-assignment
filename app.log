@@ -565,3 +565,8 @@ INFO [25-09-2024 05:44:44] namespace: message-299 new test message
 INFO [25-09-2024 05:47:44] Logger Application: Logger Application Started
 INFO [25-09-2024 05:47:57] Logger Application: Logger Application Started
 INFO [2024-09-25 05:49:35] string: string
+INFO [2024-09-25 11:28:00] string: string
+INFO [2024-09-25 11:29:26] string: string
+INFO [2024-09-25 11:33:40] string: string
+INFO [2024-09-25 11:33:40] string: string
+INFO [2024-09-25 11:33:40] string: string

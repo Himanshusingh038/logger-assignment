@@ -1,4 +1,6 @@
 import sqlite3
+
+from fastapi import HTTPException
 from src.log.sink import Sink
 from src.log.message import Message
 
@@ -26,14 +28,17 @@ class DatabaseSink(Sink):
 
     def write(self, message: Message):
         """Write a message to the SQLite database."""
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
 
-        log_entry = (message.timestamp, message.level.name, message.namespace, message.content)
-        cursor.execute('''
-            INSERT INTO logs (timestamp, level, namespace, content)
-            VALUES (?, ?, ?, ?)
-        ''', log_entry)
+            log_entry = (message.timestamp, message.level.name, message.namespace, message.content)
+            cursor.execute('''
+                INSERT INTO logs (timestamp, level, namespace, content)
+                VALUES (?, ?, ?, ?)
+            ''', log_entry)
 
-        conn.commit()
-        conn.close()
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"An error occurred : {str(e)}")
